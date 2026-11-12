@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Bed Availability{% endblock %}
+
+{% block heading %}Bed Availability{% endblock %}
+
+{% block content %}
+
+<p class="intro">
+    Check all hospital beds and their current allocation status.
+</p>
+
+
+<div class="bed-grid">
+
+    {% for b in beds %}
+
+    <article class="bed-card
+        {{ 'occupied' if b.patient_id else 'free' }}">
+
+        <div class="bed-top">
+
+            <span class="badge
+                {{ 'admitted' if b.patient_id else 'available' }}">
+
+                {{ 'Occupied' if b.patient_id else 'Available' }}
+
+            </span>
+
+        </div>
+
+
+        <h2>{{ b.bed_number }}</h2>
+
+        <p>{{ b.ward_name }}</p>
+
+        <span class="tag">
+            {{ b.bed_type }} Bed
+        </span>
+
+        <hr>
+
+
+        {% if b.patient_id %}
+
+        <p>
+            Patient:
+            <b>{{ b.patient_name }}</b>
+            (#{{ b.patient_id }})
+        </p>
+
+        {% else %}
+
+        <p class="green-text">
+            Ready for allocation
+        </p>
+
+        {% endif %}
+
+    </article>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Patients{% endblock %}
+
+{% block heading %}Patient Records{% endblock %}
+
+{% block content %}
+
+<div class="welcome">
+
+    <p class="intro">
+        View admissions, discharge patients and transfer
+        patients between bed categories.
+    </p>
+
+    <a class="btn" href="{{ url_for('admit') }}">
+        ＋ New Patient
+    </a>
+
+</div>
+
+
+<section class="panel table-wrap">
+
+    <table>
+
+        <tr>
+            <th>Patient</th>
+            <th>Age / Diagnosis</th>
+            <th>Bed / Ward</th>
+            <th>Admission</th>
+            <th>Status / Bill</th>
+            <th>Actions</th>
+        </tr>
+
+
+        {% for p in patients %}
+
+        <tr>
+
+            <td>
+                <b>{{ p.name }}</b>
+                <br>
+                <small>#{{ p.id }} {{ p.phone or '' }}</small>
+            </td>
+
+
+            <td>
+                {{ p.age }}
+                <br>
+                <small>{{ p.diagnosis }}</small>
+            </td>
+
+
+            <td>
+
+                {% if p.bed_number %}
+
+                    {{ p.bed_number }}
+                    <br>
+                    <small>{{ p.ward_name }}</small>
+
+                {% else %}
+
+                    {{ p.required_bed_type }} requested
+
+                {% endif %}
+
+            </td>
+
+
+            <td>
+
+                {{ p.admission_date }}
+
+                {% if p.discharge_date %}
+
+                    <br>
+                    <small>Discharged {{ p.discharge_date }}</small>
+
+                {% endif %}
+
+            </td>
+
+
+            <td>
+
+                <span class="badge {{ p.status|lower }}">
+                    {{ p.status }}
+                </span>
+
+                {% if p.status == 'Discharged' %}
+
+                    <br>
+                    <small>
+                        ₹{{ "%.2f"|format(p.total_bill or 0) }}
+                    </small>
+
+                {% endif %}
+
+            </td>
+
+
+            <td class="actions">
+
+                {% if p.status == 'Admitted' %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for('discharge', pid=p.id) }}"
+                    onsubmit="return confirm('Discharge this patient?')">
+
+                    <button class="mini danger">
+                        Discharge
+                    </button>
+
+                </form>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for('transfer', pid=p.id) }}">
+
+                    <select name="bed_type">
+
+                        <option value="">
+                            Transfer to...
+                        </option>
+
+                        {% for kind in rates %}
+
+                            {% if kind != p.required_bed_type %}
+
+                                <option>{{ kind }}</option>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </select>
+
+                    <button class="mini">
+                        Move
+                    </button>
+
+                </form>
+
+
+                {% elif p.status == 'Waiting' %}
+
+                    In queue
+
+                {% else %}
+
+                    Completed
+
+                {% endif %}
+
+            </td>
+
+        </tr>
+
+
+        {% else %}
+
+        <tr>
+            <td colspan="6">No patient records found.</td>
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</section>
+
+{% endblock %}

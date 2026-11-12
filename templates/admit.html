@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Admit Patient{% endblock %}
+
+{% block heading %}Admit New Patient{% endblock %}
+
+{% block content %}
+
+<p class="intro">
+    Register a patient. BedFlow allocates a suitable available
+    bed or adds the patient to the waiting list.
+</p>
+
+
+<div class="columns form-columns">
+
+    <form class="panel" method="POST">
+
+        <h3>Patient Information</h3>
+
+        <div class="form-grid">
+
+            <label>
+                Full name *
+
+                <input
+                    name="name"
+                    required
+                    maxlength="100"
+                    placeholder="Patient name">
+            </label>
+
+
+            <label>
+                Age *
+
+                <input
+                    name="age"
+                    type="number"
+                    min="1"
+                    max="120"
+                    required
+                    placeholder="Age">
+            </label>
+
+
+            <label>
+                Phone number
+
+                <input
+                    name="phone"
+                    placeholder="Optional phone">
+            </label>
+
+
+            <label>
+                Required bed type *
+
+                <select name="bed_type" required>
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    <option>General</option>
+
+                    <option>Semi-Private</option>
+
+                    <option>ICU</option>
+
+                </select>
+
+            </label>
+
+
+            <label class="full">
+                Diagnosis / reason *
+
+                <textarea
+                    name="diagnosis"
+                    rows="4"
+                    required
+                    placeholder="Enter diagnosis">
+                </textarea>
+            </label>
+
+        </div>
+
+
+        <button class="btn">
+            Register Patient →
+        </button>
+
+    </form>
+
+
+    <aside class="panel">
+
+        <h3>Bed Categories</h3>
+
+        <p>Illustrative daily bed charges</p>
+
+        {% for kind, rate in rates.items() %}
+
+        <div class="rate">
+
+            <span>{{ kind }}</span>
+
+            <b>₹{{ "{:,}".format(rate) }} / day</b>
+
+        </div>
+
+        {% endfor %}
+
+
+        <div class="note">
+
+            <b>Automatic allocation</b>
+
+            <p>
+                If no matching bed is free, the patient is placed
+                in the FIFO queue. The earliest request gets the
+                next matching free bed.
+            </p>
+
+        </div>
+
+    </aside>
+
+</div>
+
+{% endblock %}

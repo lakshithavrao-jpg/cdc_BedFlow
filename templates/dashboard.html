@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | BedFlow{% endblock %}
+
+{% block heading %}Dashboard Overview{% endblock %}
+
+{% block content %}
+
+<div class="welcome">
+
+    <div>
+
+        <h2>Welcome to BedFlow</h2>
+
+        <p>
+            Monitor hospital beds, admissions and patient queues.
+        </p>
+
+    </div>
+
+    <a class="btn" href="{{ url_for('admit') }}">
+        ＋ Admit Patient
+    </a>
+
+</div>
+
+
+<div class="stats">
+
+    <article>
+        <small>Total Beds</small>
+        <h2>{{ total }}</h2>
+        <p>Across all wards</p>
+    </article>
+
+    <article>
+        <small>Available Beds</small>
+        <h2>{{ available }}</h2>
+        <p>Ready for admission</p>
+    </article>
+
+    <article>
+        <small>Admitted Patients</small>
+        <h2>{{ occupied }}</h2>
+        <p>Currently admitted</p>
+    </article>
+
+    <article>
+        <small>Waiting Patients</small>
+        <h2>{{ waiting }}</h2>
+        <p>FIFO queue</p>
+    </article>
+
+</div>
+
+
+<div class="columns">
+
+    <section class="panel">
+
+        <h3>Ward Occupancy</h3>
+
+        <p class="muted">Current bed usage</p>
+
+        {% for w in wards %}
+
+        <div class="ward">
+
+            <div>
+
+                <b>{{ w.name }}</b>
+
+                <span>
+                    {{ w.occupied or 0 }} / {{ w.total }} beds
+                </span>
+
+            </div>
+
+            <div class="bar">
+
+                <i style="width:
+                    {{ ((w.occupied or 0)*100/w.total) if w.total else 0 }}%">
+                </i>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+        <b>Overall occupancy: {{ occupancy }}%</b>
+
+    </section>
+
+
+    <section class="panel">
+
+        <h3>Quick Actions</h3>
+
+        <a class="quick" href="{{ url_for('admit') }}">
+            ＋ New patient admission
+        </a>
+
+        <a class="quick" href="{{ url_for('beds') }}">
+            ▤ View bed availability
+        </a>
+
+        <a class="quick" href="{{ url_for('waiting_list') }}">
+            ☷ Check waiting list
+        </a>
+
+    </section>
+
+</div>
+
+
+<section class="panel">
+
+    <h3>Recent Patient Records</h3>
+
+    <div class="table-wrap">
+
+        <table>
+
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Diagnosis</th>
+                <th>Admission Date</th>
+                <th>Status</th>
+            </tr>
+
+            {% for p in recent %}
+
+            <tr>
+
+                <td>#{{ p.id }}</td>
+
+                <td>{{ p.name }}</td>
+
+                <td>{{ p.diagnosis }}</td>
+
+                <td>{{ p.admission_date }}</td>
+
+                <td>
+                    <span class="badge {{ p.status|lower }}">
+                        {{ p.status }}
+                    </span>
+                </td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+                <td colspan="5">No patient records yet.</td>
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endblock %}

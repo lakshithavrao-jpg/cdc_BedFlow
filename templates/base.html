@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}BedFlow{% endblock %}
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <h2>✚ BedFlow</h2>
+
+    <p>HOSPITAL MANAGEMENT</p>
+
+    <a href="{{ url_for('dashboard') }}">
+        Dashboard
+    </a>
+
+    <a href="{{ url_for('admit') }}">
+        Admit Patient
+    </a>
+
+    <a href="{{ url_for('beds') }}">
+        Bed Availability
+    </a>
+
+    <a href="{{ url_for('patients') }}">
+        Patients
+    </a>
+
+    <a href="{{ url_for('waiting_list') }}">
+        Waiting List
+    </a>
+
+    <div class="side-foot">
+        ● System operational
+    </div>
+
+</aside>
+
+
+<main>
+
+    <header>
+
+        <div>
+
+            <small>HOSPITAL OPERATIONS</small>
+
+            <h1>
+                {% block heading %}Dashboard{% endblock %}
+            </h1>
+
+        </div>
+
+        <span>{{ current_date }}</span>
+
+    </header>
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% for category, message in messages %}
+
+            <div class="alert {{ category }}">
+
+                {{ message }}
+
+                <button class="close-alert">×</button>
+
+            </div>
+
+        {% endfor %}
+
+    {% endwith %}
+
+
+    {% block content %}
+
+    {% endblock %}
+
+
+    <footer>
+        BedFlow · Academic demonstration · Use fictional patient data
+    </footer>
+
+</main>
+
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
