@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Dashboard | BedFlow{% endblock %}
+
+{% block content %}
+
+<div class="page-heading">
+    <h1>My Patient Dashboard</h1>
+    <p>Welcome, {{ patient.name }}. Here you can view your hospital information.</p>
+</div>
+
+
+<div class="grid">
+
+    <div class="stat-card">
+        <h3>Patient ID</h3>
+        <div class="number" style="font-size:22px;">
+            {{ patient.login_id }}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <h3>Current Status</h3>
+        <div class="number" style="font-size:22px;">
+            {{ patient.status }}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <h3>Total Bill</h3>
+        <div class="number" style="font-size:25px;">
+            ₹{{ "%.2f"|format(total_bill) }}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <h3>Required Bed</h3>
+        <div class="number" style="font-size:22px;">
+            {{ patient.required_bed_type }}
+        </div>
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <h2>Personal Information</h2>
+
+    <div class="grid">
+
+        <div>
+            <strong>Patient Name</strong>
+            <p>{{ patient.name }}</p>
+        </div>
+
+        <div>
+            <strong>Patient ID</strong>
+            <p>{{ patient.login_id }}</p>
+        </div>
+
+        <div>
+            <strong>Age</strong>
+            <p>{{ patient.age }}</p>
+        </div>
+
+        <div>
+            <strong>Gender</strong>
+            <p>{{ patient.gender or '-' }}</p>
+        </div>
+
+        <div>
+            <strong>Email</strong>
+            <p>{{ patient.email or '-' }}</p>
+        </div>
+
+        <div>
+            <strong>Phone</strong>
+            <p>{{ patient.phone or '-' }}</p>
+        </div>
+
+        <div>
+            <strong>Diagnosis</strong>
+            <p>{{ patient.diagnosis }}</p>
+        </div>
+
+        <div>
+            <strong>Address</strong>
+            <p>{{ patient.address or '-' }}</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <h2>Current Admission</h2>
+
+    {% if current_admission %}
+
+        <div class="grid">
+
+            <div>
+                <strong>Admission Date & Time</strong>
+                <p>{{ current_admission.admission_date }}</p>
+            </div>
+
+            <div>
+                <strong>Ward</strong>
+                <p>{{ current_admission.ward_name }}</p>
+            </div>
+
+            <div>
+                <strong>Bed Number</strong>
+                <p>{{ current_admission.bed_number }}</p>
+            </div>
+
+            <div>
+                <strong>Bed Type</strong>
+                <p>{{ current_admission.bed_type }}</p>
+            </div>
+
+            <div>
+                <strong>Daily Rate</strong>
+                <p>₹{{ current_admission.rate_per_day }}</p>
+            </div>
+
+            <div>
+                <strong>Admission Status</strong>
+                <p>
+                    <span class="badge badge-success">
+                        {{ current_admission.status }}
+                    </span>
+                </p>
+            </div>
+
+        </div>
+
+    {% elif waiting %}
+
+        <div class="alert alert-warning">
+            You are currently on the waiting list for a
+            {{ waiting.bed_type }} bed.
+            <br>
+            Requested at: {{ waiting.requested_at }}
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            You do not have an active admission.
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<div class="card">
+
+    <h2>Admission and Discharge History</h2>
+
+    {% if admissions %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Admission ID</th>
+                        <th>Ward</th>
+                        <th>Bed Number</th>
+                        <th>Bed Type</th>
+                        <th>Admitted At</th>
+                        <th>Discharged At</th>
+                        <th>Daily Rate</th>
+                        <th>Bill</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for admission in admissions %}
+
+                    <tr>
+                        <td>{{ admission.id }}</td>
+                        <td>{{ admission.ward_name }}</td>
+                        <td>{{ admission.bed_number }}</td>
+                        <td>{{ admission.bed_type }}</td>
+                        <td>{{ admission.admission_date }}</td>
+                        <td>{{ admission.discharge_date or 'Not discharged' }}</td>
+                        <td>₹{{ admission.rate_per_day }}</td>
+                        <td>₹{{ admission.bill_amount or 0 }}</td>
+
+                        <td>
+                            <span class="badge
+                                {% if admission.status == 'Admitted' %}
+                                    badge-success
+                                {% else %}
+                                    badge-warning
+                                {% endif %}">
+                                {{ admission.status }}
+                            </span>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            No admission history available.
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<div class="card">
+
+    <h2>Doctor Consultations</h2>
+
+    {% if consultations %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Doctor Name</th>
+                        <th>Department</th>
+                        <th>Consultation Date & Time</th>
+                        <th>Notes</th>
+                        <th>Consultation Fee</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for consultation in consultations %}
+
+                    <tr>
+                        <td>{{ consultation.doctor_name }}</td>
+                        <td>{{ consultation.department or '-' }}</td>
+                        <td>{{ consultation.consultation_date }}</td>
+                        <td>{{ consultation.notes or '-' }}</td>
+                        <td>₹{{ consultation.consultation_fee or 0 }}</td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            No doctor consultation records available.
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

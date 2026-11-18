@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Consultations | BedFlow{% endblock %}
+
+{% block content %}
+
+<div class="page-heading">
+    <h1>Doctor Consultations</h1>
+    <p>Record and manage patient doctor consultation details.</p>
+</div>
+
+
+<div class="card" style="max-width:750px;">
+
+    <h2>Add Consultation Record</h2>
+
+    <form method="POST">
+
+        <div class="form-group">
+
+            <label>Select Patient</label>
+
+            <select name="patient_id" required>
+
+                <option value="">Choose Patient</option>
+
+                {% for patient in patients %}
+
+                    <option value="{{ patient.id }}">
+                        {{ patient.name }} - {{ patient.login_id }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Doctor Name</label>
+
+            <input type="text"
+                   name="doctor_name"
+                   required
+                   placeholder="Enter doctor name">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Department / Specialization</label>
+
+            <input type="text"
+                   name="department"
+                   placeholder="Example: Cardiology">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Consultation Notes</label>
+
+            <textarea name="notes"
+                      placeholder="Enter consultation details"></textarea>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Consultation Fee (₹)</label>
+
+            <input type="number"
+                   name="consultation_fee"
+                   min="0"
+                   step="0.01"
+                   value="0">
+
+        </div>
+
+
+        <button type="submit" class="btn">
+            Save Consultation
+        </button>
+
+    </form>
+
+</div>
+
+
+<div class="card">
+
+    <h2>Consultation History</h2>
+
+    {% if consultations %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Patient ID</th>
+                        <th>Patient Name</th>
+                        <th>Doctor</th>
+                        <th>Department</th>
+                        <th>Date & Time</th>
+                        <th>Notes</th>
+                        <th>Fee</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for consultation in consultations %}
+
+                    <tr>
+
+                        <td>{{ consultation.login_id }}</td>
+                        <td>{{ consultation.patient_name }}</td>
+                        <td>{{ consultation.doctor_name }}</td>
+                        <td>{{ consultation.department or '-' }}</td>
+                        <td>{{ consultation.consultation_date }}</td>
+                        <td>{{ consultation.notes or '-' }}</td>
+                        <td>₹{{ consultation.consultation_fee or 0 }}</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            No consultation records available.
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

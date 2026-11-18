@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+
+    <div class="hero-copy">
+
+        <span class="eyebrow">
+            SMART HOSPITAL MANAGEMENT
+        </span>
+
+        <h1>
+            Better care starts with
+            <br>
+            <em>better coordination.</em>
+        </h1>
+
+        <p>
+            Manage hospital beds, admissions and patient records
+            through one simple and organized platform.
+        </p>
+
+        <div class="actions">
+
+            <a
+                class="button primary"
+                href="{{ url_for('login', role='patient') }}"
+            >
+                Patient Login
+            </a>
+
+            <a
+                class="button light"
+                href="{{ url_for('login', role='admin') }}"
+            >
+                Admin Login
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="hero-panel">
+
+        <div class="pulse">
+            ✚
+        </div>
+
+        <h3>
+            Care, connected.
+        </h3>
+
+        <p>
+            Admissions · Bed availability · Patient history
+        </p>
+
+        <div class="mini-stats">
+
+            <div>
+                <b>24/7</b>
+                <small>Access</small>
+            </div>
+
+            <div>
+                <b>One</b>
+                <small>Dashboard</small>
+            </div>
+
+            <div>
+                <b>Secure</b>
+                <small>Records</small>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="register-strip">
+
+    <div>
+
+        <h2>
+            New to BedFlow?
+        </h2>
+
+        <p>
+            Create an account to get started.
+        </p>
+
+    </div>
+
+    <a
+        class="button primary"
+        href="{{ url_for('register') }}"
+    >
+        Create Account →
+    </a>
+
+</section>
+
+{% endblock %}

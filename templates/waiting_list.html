@@ -1,85 +1,81 @@
 {% extends "base.html" %}
 
-{% block title %}Waiting List{% endblock %}
-
-{% block heading %}Patient Waiting List{% endblock %}
+{% block title %}Waiting List | BedFlow{% endblock %}
 
 {% block content %}
 
-<p class="intro">
-    Patients are served in First In, First Out (FIFO)
-    order for each bed category.
-</p>
+<div class="page-heading">
+    <h1>Patient Waiting List</h1>
+    <p>Patients are displayed in the order in which they requested a bed.</p>
+</div>
 
 
-<section class="panel">
+<div class="grid">
 
-    <h3>
-        Current Queue — {{ queue|length }} patient(s)
-    </h3>
-
-
-    <div class="table-wrap">
-
-        <table>
-
-            <tr>
-                <th>Position</th>
-                <th>Patient</th>
-                <th>Age</th>
-                <th>Diagnosis</th>
-                <th>Bed Type</th>
-                <th>Requested At</th>
-            </tr>
-
-
-            {% for p in queue %}
-
-            <tr>
-
-                <td>{{ loop.index }}</td>
-
-                <td>
-                    {{ p.name }}
-                    (#{{ p.patient_id }})
-                </td>
-
-                <td>{{ p.age }}</td>
-
-                <td>{{ p.diagnosis }}</td>
-
-                <td>{{ p.bed_type }}</td>
-
-                <td>{{ p.requested_at }}</td>
-
-            </tr>
-
-
-            {% else %}
-
-            <tr>
-                <td colspan="6">Waiting list is empty.</td>
-            </tr>
-
-            {% endfor %}
-
-        </table>
-
+    <div class="stat-card">
+        <h3>Total Waiting Patients</h3>
+        <div class="number">{{ waiting_list|length }}</div>
     </div>
 
-</section>
+</div>
 
 
-<section class="panel">
+<div class="card">
 
-    <h3>How FIFO works</h3>
+    <h2>Waiting Patients</h2>
 
-    <p>
-        When a matching bed becomes free after discharge or
-        transfer, BedFlow allocates it to the earliest
-        waiting request first.
-    </p>
+    {% if waiting_list %}
 
-</section>
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Queue Position</th>
+                        <th>Patient ID</th>
+                        <th>Patient Name</th>
+                        <th>Age</th>
+                        <th>Phone</th>
+                        <th>Diagnosis</th>
+                        <th>Required Bed</th>
+                        <th>Requested At</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for patient in waiting_list %}
+
+                    <tr>
+
+                        <td>{{ loop.index }}</td>
+                        <td>{{ patient.login_id }}</td>
+                        <td>{{ patient.name }}</td>
+                        <td>{{ patient.age }}</td>
+                        <td>{{ patient.phone or '-' }}</td>
+                        <td>{{ patient.diagnosis }}</td>
+                        <td>{{ patient.bed_type }}</td>
+                        <td>{{ patient.requested_at }}</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            No patients are currently waiting for beds.
+        </div>
+
+    {% endif %}
+
+</div>
 
 {% endblock %}

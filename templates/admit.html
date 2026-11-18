@@ -1,131 +1,132 @@
 {% extends "base.html" %}
 
-{% block title %}Admit Patient{% endblock %}
-
-{% block heading %}Admit New Patient{% endblock %}
+{% block title %}Patient Admission | BedFlow{% endblock %}
 
 {% block content %}
 
-<p class="intro">
-    Register a patient. BedFlow allocates a suitable available
-    bed or adds the patient to the waiting list.
-</p>
+<div class="page-heading">
+    <h1>Patient Admission</h1>
+    <p>Allocate an available hospital bed to a registered patient.</p>
+</div>
 
 
-<div class="columns form-columns">
+<div class="card" style="max-width:700px;margin:auto;">
 
-    <form class="panel" method="POST">
+    <h2>Admit Patient</h2>
 
-        <h3>Patient Information</h3>
+    <form method="POST">
 
-        <div class="form-grid">
+        <div class="form-group">
 
-            <label>
-                Full name *
+            <label>Select Patient</label>
 
-                <input
-                    name="name"
-                    required
-                    maxlength="100"
-                    placeholder="Patient name">
-            </label>
+            <select name="patient_id" required>
 
+                <option value="">Choose Patient</option>
 
-            <label>
-                Age *
+                {% for patient in patients %}
 
-                <input
-                    name="age"
-                    type="number"
-                    min="1"
-                    max="120"
-                    required
-                    placeholder="Age">
-            </label>
-
-
-            <label>
-                Phone number
-
-                <input
-                    name="phone"
-                    placeholder="Optional phone">
-            </label>
-
-
-            <label>
-                Required bed type *
-
-                <select name="bed_type" required>
-
-                    <option value="">
-                        Select category
+                    <option value="{{ patient.id }}">
+                        {{ patient.name }} - {{ patient.login_id }}
+                        ({{ patient.required_bed_type }})
                     </option>
 
-                    <option>General</option>
+                {% endfor %}
 
-                    <option>Semi-Private</option>
-
-                    <option>ICU</option>
-
-                </select>
-
-            </label>
-
-
-            <label class="full">
-                Diagnosis / reason *
-
-                <textarea
-                    name="diagnosis"
-                    rows="4"
-                    required
-                    placeholder="Enter diagnosis">
-                </textarea>
-            </label>
+            </select>
 
         </div>
 
 
-        <button class="btn">
-            Register Patient →
+        <div class="form-group">
+
+            <label>Select Available Bed</label>
+
+            <select name="bed_id">
+
+                <option value="">
+                    Automatically select a suitable bed
+                </option>
+
+                {% for bed in beds %}
+
+                    <option value="{{ bed.id }}">
+                        {{ bed.ward_name }} -
+                        {{ bed.bed_number }} -
+                        {{ bed.bed_type }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+            <small>
+                Choose a bed matching the patient's required bed type.
+                If no suitable bed is available, the patient will be
+                added to the waiting list.
+            </small>
+
+        </div>
+
+
+        <button type="submit" class="btn" style="width:100%;">
+            Confirm Admission
         </button>
 
     </form>
 
+</div>
 
-    <aside class="panel">
 
-        <h3>Bed Categories</h3>
+<div class="card" style="margin-top:25px;">
 
-        <p>Illustrative daily bed charges</p>
+    <h2>Available Beds</h2>
 
-        {% for kind, rate in rates.items() %}
+    {% if beds %}
 
-        <div class="rate">
+        <div class="table-wrapper">
 
-            <span>{{ kind }}</span>
+            <table>
 
-            <b>₹{{ "{:,}".format(rate) }} / day</b>
+                <thead>
+                    <tr>
+                        <th>Ward</th>
+                        <th>Bed Number</th>
+                        <th>Bed Type</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for bed in beds %}
+
+                    <tr>
+                        <td>{{ bed.ward_name }}</td>
+                        <td>{{ bed.bed_number }}</td>
+                        <td>{{ bed.bed_type }}</td>
+                        <td>
+                            <span class="badge badge-success">
+                                Available
+                            </span>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
 
         </div>
 
-        {% endfor %}
+    {% else %}
 
-
-        <div class="note">
-
-            <b>Automatic allocation</b>
-
-            <p>
-                If no matching bed is free, the patient is placed
-                in the FIFO queue. The earliest request gets the
-                next matching free bed.
-            </p>
-
+        <div class="empty-state">
+            No available beds at the moment.
         </div>
 
-    </aside>
+    {% endif %}
 
 </div>
 

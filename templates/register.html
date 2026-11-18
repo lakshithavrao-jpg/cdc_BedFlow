@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Register | BedFlow{% endblock %}
+
+{% block content %}
+
+<style>
+.register-wrapper {
+    max-width: 650px;
+    margin: 20px auto;
+}
+
+.register-card {
+    background: white;
+    padding: 35px;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.07);
+}
+
+.register-card h1 {
+    color: #123b70;
+    margin-bottom: 10px;
+}
+
+.register-card p {
+    color: #718096;
+    margin-bottom: 25px;
+}
+</style>
+
+<div class="register-wrapper">
+
+    <div class="register-card">
+
+        <h1>Create Your Account</h1>
+
+        <p>
+            Register as an {{ role }} to access BedFlow.
+        </p>
+
+        <form method="POST"
+              action="{{ url_for('register', role=role) }}">
+
+            <input type="hidden" name="role" value="{{ role }}">
+
+            <div class="form-group">
+                <label>Full Name *</label>
+                <input type="text" name="name" required
+                       placeholder="Enter full name">
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email"
+                       placeholder="Enter email address">
+            </div>
+
+            {% if role == 'patient' %}
+
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" name="age" min="1" max="120"
+                           placeholder="Enter age">
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" name="phone"
+                           placeholder="Enter phone number">
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select name="gender">
+                        <option value="">Select gender</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea name="address"
+                              placeholder="Enter address"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Diagnosis / Health Concern</label>
+                    <input type="text" name="diagnosis"
+                           placeholder="Enter diagnosis if known">
+                </div>
+
+                <div class="form-group">
+                    <label>Required Bed Type</label>
+                    <select name="required_bed_type">
+                        <option value="General">General</option>
+                        <option value="Semi-Private">Semi-Private</option>
+                        <option value="ICU">ICU</option>
+                    </select>
+                </div>
+
+            {% endif %}
+
+            <div class="form-group">
+                <label>Password *</label>
+                <input type="password" name="password"
+                       minlength="6" required
+                       placeholder="Create password">
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Password *</label>
+                <input type="password" name="confirm_password"
+                       minlength="6" required
+                       placeholder="Confirm password">
+            </div>
+
+            <button type="submit" class="btn" style="width:100%;">
+                Create Account
+            </button>
+
+        </form>
+
+        <p style="margin-top:25px;text-align:center;">
+            Already registered?
+            <a href="{{ url_for('login', role=role) }}">
+                Login here
+            </a>
+        </p>
+
+        <p style="text-align:center;">
+            {% if role == 'patient' %}
+                <a href="{{ url_for('register', role='admin') }}">
+                    Register as Admin
+                </a>
+            {% else %}
+                <a href="{{ url_for('register', role='patient') }}">
+                    Register as Patient
+                </a>
+            {% endif %}
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

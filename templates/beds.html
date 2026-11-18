@@ -1,65 +1,155 @@
 {% extends "base.html" %}
 
-{% block title %}Bed Availability{% endblock %}
-
-{% block heading %}Bed Availability{% endblock %}
+{% block title %}Bed Management | BedFlow{% endblock %}
 
 {% block content %}
 
-<p class="intro">
-    Check all hospital beds and their current allocation status.
-</p>
+<div class="page-heading">
+    <h1>Bed and Ward Management</h1>
+    <p>Manage hospital wards, bed types and availability.</p>
+</div>
 
 
-<div class="bed-grid">
+<div class="grid">
 
-    {% for b in beds %}
+    <div class="card">
 
-    <article class="bed-card
-        {{ 'occupied' if b.patient_id else 'free' }}">
+        <h2>Add New Ward</h2>
 
-        <div class="bed-top">
+        <form method="POST">
 
-            <span class="badge
-                {{ 'admitted' if b.patient_id else 'available' }}">
+            <input type="hidden" name="action" value="add_ward">
 
-                {{ 'Occupied' if b.patient_id else 'Available' }}
+            <div class="form-group">
+                <label>Ward Name</label>
+                <input type="text" name="ward_name"
+                       placeholder="Example: General Ward A"
+                       required>
+            </div>
 
-            </span>
+            <button class="btn" type="submit">
+                Add Ward
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Add New Bed</h2>
+
+        <form method="POST">
+
+            <input type="hidden" name="action" value="add_bed">
+
+            <div class="form-group">
+                <label>Select Ward</label>
+
+                <select name="ward_id" required>
+
+                    <option value="">Choose Ward</option>
+
+                    {% for ward in wards %}
+                        <option value="{{ ward.id }}">
+                            {{ ward.name }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Bed Number</label>
+                <input type="text" name="bed_number"
+                       placeholder="Example: G101"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>Bed Type</label>
+
+                <select name="bed_type" required>
+                    <option value="General">General</option>
+                    <option value="Semi-Private">Semi-Private</option>
+                    <option value="ICU">ICU</option>
+                </select>
+            </div>
+
+            <button class="btn" type="submit">
+                Add Bed
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <h2>Bed Availability</h2>
+
+    {% if beds %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Bed ID</th>
+                        <th>Ward</th>
+                        <th>Bed Number</th>
+                        <th>Bed Type</th>
+                        <th>Status</th>
+                        <th>Patient</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for bed in beds %}
+
+                    <tr>
+                        <td>{{ bed.id }}</td>
+                        <td>{{ bed.ward_name }}</td>
+                        <td>{{ bed.bed_number }}</td>
+                        <td>{{ bed.bed_type }}</td>
+
+                        <td>
+                            {% if bed.status == 'Available' %}
+                                <span class="badge badge-success">
+                                    Available
+                                </span>
+                            {% else %}
+                                <span class="badge badge-danger">
+                                    Occupied
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ bed.patient_name or '-' }}</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
 
         </div>
 
+    {% else %}
 
-        <h2>{{ b.bed_number }}</h2>
+        <div class="empty-state">
+            No beds added yet.
+        </div>
 
-        <p>{{ b.ward_name }}</p>
-
-        <span class="tag">
-            {{ b.bed_type }} Bed
-        </span>
-
-        <hr>
-
-
-        {% if b.patient_id %}
-
-        <p>
-            Patient:
-            <b>{{ b.patient_name }}</b>
-            (#{{ b.patient_id }})
-        </p>
-
-        {% else %}
-
-        <p class="green-text">
-            Ready for allocation
-        </p>
-
-        {% endif %}
-
-    </article>
-
-    {% endfor %}
+    {% endif %}
 
 </div>
 

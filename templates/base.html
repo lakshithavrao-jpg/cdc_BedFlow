@@ -1,104 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BedFlow | Hospital Management{% endblock %}</title>
 
-    <title>
-        {% block title %}BedFlow{% endblock %}
-    </title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #263445;
+        }
+
+        .navbar {
+            background: #123b70;
+            color: white;
+            padding: 17px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 25px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-links a:hover {
+            color: #a9d9ff;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1400px;
+            margin: 30px auto;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            color: #123b70;
+            margin-bottom: 8px;
+        }
+
+        .page-heading p {
+            color: #718096;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 22px;
+        }
+
+        .card h2, .card h3 {
+            color: #123b70;
+            margin-bottom: 17px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-left: 5px solid #1688c9;
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 12px;
+        }
+
+        .stat-card .number {
+            font-size: 30px;
+            font-weight: bold;
+            color: #123b70;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 7px;
+            background: #1676b8;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            opacity: 0.88;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-success {
+            background: #198754;
+        }
+
+        .btn-warning {
+            background: #e09b20;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+        }
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d5dce5;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th, td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #edf0f4;
+            font-size: 14px;
+        }
+
+        th {
+            background: #eaf2fa;
+            color: #123b70;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .alert {
+            padding: 13px 16px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #718096;
+            margin-top: 40px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 25px;
+            color: #718096;
+        }
+
+        @media(max-width: 700px) {
+            .navbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .container {
+                width: 94%;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<aside class="sidebar">
+<nav class="navbar">
 
-    <h2>✚ BedFlow</h2>
-
-    <p>HOSPITAL MANAGEMENT</p>
-
-    <a href="{{ url_for('dashboard') }}">
-        Dashboard
+    <a href="{{ url_for('index') }}" class="brand">
+        🏥 BedFlow
     </a>
 
-    <a href="{{ url_for('admit') }}">
-        Admit Patient
-    </a>
+    <div class="nav-links">
 
-    <a href="{{ url_for('beds') }}">
-        Bed Availability
-    </a>
+        {% if session.get('role') == 'admin' %}
 
-    <a href="{{ url_for('patients') }}">
-        Patients
-    </a>
+            <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('patients') }}">Patients</a>
+            <a href="{{ url_for('beds') }}">Beds & Wards</a>
+            <a href="{{ url_for('admit') }}">Admission</a>
+            <a href="{{ url_for('waiting_list') }}">Waiting List</a>
+            <a href="{{ url_for('add_consultation') }}">Consultations</a>
+            <a href="{{ url_for('change_password') }}">Password</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
 
-    <a href="{{ url_for('waiting_list') }}">
-        Waiting List
-    </a>
+        {% elif session.get('role') == 'patient' %}
 
-    <div class="side-foot">
-        ● System operational
+            <a href="{{ url_for('patient_dashboard') }}">My Dashboard</a>
+            <a href="{{ url_for('patient_change_password') }}">Password</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+
+        {% else %}
+
+            <a href="{{ url_for('login', role='patient') }}">Patient Login</a>
+            <a href="{{ url_for('login', role='admin') }}">Admin Login</a>
+            <a href="{{ url_for('register', role='patient') }}">Register</a>
+
+        {% endif %}
+
     </div>
 
-</aside>
+</nav>
 
 
-<main>
-
-    <header>
-
-        <div>
-
-            <small>HOSPITAL OPERATIONS</small>
-
-            <h1>
-                {% block heading %}Dashboard{% endblock %}
-            </h1>
-
-        </div>
-
-        <span>{{ current_date }}</span>
-
-    </header>
-
+<main class="container">
 
     {% with messages = get_flashed_messages(with_categories=true) %}
-
-        {% for category, message in messages %}
-
-            <div class="alert {{ category }}">
-
-                {{ message }}
-
-                <button class="close-alert">×</button>
-
-            </div>
-
-        {% endfor %}
-
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
     {% endwith %}
-
 
     {% block content %}
 
+        <div class="card" style="text-align:center;padding:60px 20px;">
+            <h1>Welcome to BedFlow</h1>
+            <p style="margin:20px 0;">
+                Hospital Bed Allocation and Patient Management System
+            </p>
+            <a class="btn" href="{{ url_for('login', role='patient') }}">
+                Patient Login
+            </a>
+            <a class="btn" href="{{ url_for('login', role='admin') }}">
+                Admin Login
+            </a>
+        </div>
+
     {% endblock %}
-
-
-    <footer>
-        BedFlow · Academic demonstration · Use fictional patient data
-    </footer>
 
 </main>
 
 
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+<footer class="footer">
+    © 2026 BedFlow | Hospital Bed Allocation and Patient Management System
+</footer>
 
 </body>
 </html>

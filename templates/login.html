@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.login-page {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 35px 15px;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 950px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: white;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.12);
+}
+
+.login-info {
+    padding: 55px 40px;
+    background: linear-gradient(135deg, #123b70, #1676b8);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-info h1 {
+    font-size: 36px;
+    margin-bottom: 15px;
+}
+
+.login-info p {
+    line-height: 1.8;
+    color: #e4efff;
+}
+
+.login-info ul {
+    margin-top: 25px;
+    padding-left: 20px;
+    line-height: 2.2;
+}
+
+.login-card {
+    padding: 50px 40px;
+}
+
+.login-card h2 {
+    color: #173b65;
+    font-size: 29px;
+    margin-bottom: 8px;
+}
+
+.login-subtitle {
+    color: #777;
+    margin-bottom: 30px;
+}
+
+.portal-label {
+    display: inline-block;
+    background: #e5f1ff;
+    color: #1769aa;
+    border-radius: 20px;
+    padding: 7px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #d7dce5;
+    border-radius: 9px;
+    outline: none;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    border-color: #1676b8;
+    box-shadow: 0 0 0 3px rgba(22,118,184,0.1);
+}
+
+.password-box {
+    position: relative;
+}
+
+.password-box input {
+    padding-right: 65px;
+}
+
+.show-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #1676b8;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.login-button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #1769aa, #1688c9);
+    border: none;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 9px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.login-button:hover {
+    opacity: 0.9;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 25px;
+    color: #666;
+}
+
+.login-footer a {
+    color: #1676b8;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.switch-login {
+    display: block;
+    text-align: center;
+    margin-top: 18px;
+    color: #1769aa;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+@media(max-width: 750px) {
+    .login-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .login-info {
+        padding: 30px;
+    }
+
+    .login-card {
+        padding: 35px 25px;
+    }
+}
+</style>
+
+
+<div class="login-page">
+
+    <div class="login-wrapper">
+
+        <div class="login-info">
+
+            <h1>BedFlow</h1>
+
+            <p>
+                Smart Hospital Bed Allocation and
+                Patient Management System.
+            </p>
+
+            <ul>
+                <li>Easy patient management</li>
+                <li>Real-time bed availability</li>
+                <li>Admission and discharge tracking</li>
+                <li>Patient billing information</li>
+                <li>Waiting list management</li>
+            </ul>
+
+        </div>
+
+
+        <div class="login-card">
+
+            <span class="portal-label">
+                {{ role|upper if role else 'PATIENT' }} PORTAL
+            </span>
+
+            <h2>
+                {{ 'Patient' if role == 'patient' else 'Admin' }} Login
+            </h2>
+
+            <p class="login-subtitle">
+                Enter your account details to continue.
+            </p>
+
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+
+            <form
+                method="POST"
+                action="{{ url_for('login', role=role or 'patient') }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="role"
+                    value="{{ role or 'patient' }}"
+                >
+
+                <div class="form-group">
+
+                    <label for="login_id">
+                        Patient/Admin ID or Email
+                    </label>
+
+                    <input
+                        type="text"
+                        id="login_id"
+                        name="login_id"
+                        placeholder="Enter your Login ID or email"
+                        required
+                        autocomplete="username"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <div class="password-box">
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            required
+                            autocomplete="current-password"
+                        >
+
+                        <button
+                            type="button"
+                            class="show-password"
+                            onclick="togglePassword()"
+                        >
+                            Show
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <button type="submit" class="login-button">
+                    Login to BedFlow
+                </button>
+
+            </form>
+
+
+            <div class="login-footer">
+
+                Don't have an account?
+
+                <a href="{{ url_for('register', role=role or 'patient') }}">
+                    Register here
+                </a>
+
+            </div>
+
+
+            <a
+                class="switch-login"
+                href="{{ url_for('login', role='admin' if role == 'patient' else 'patient') }}"
+            >
+                {% if role == 'patient' %}
+                    Login as Admin
+                {% else %}
+                    Login as Patient
+                {% endif %}
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+function togglePassword() {
+
+    const password = document.getElementById("password");
+    const button = document.querySelector(".show-password");
+
+    if (password.type === "password") {
+        password.type = "text";
+        button.textContent = "Hide";
+    } else {
+        password.type = "password";
+        button.textContent = "Show";
+    }
+}
+</script>
+
+{% endblock %}

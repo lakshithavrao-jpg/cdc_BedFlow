@@ -1,0 +1,508 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | BedFlow{% endblock %}
+
+{% block content %}
+
+<style>
+    .dashboard-container {
+        padding: 20px 10px;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+        gap: 15px;
+    }
+
+    .dashboard-header h2 {
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: #172554;
+    }
+
+    .dashboard-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 18px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 22px;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        border-left: 5px solid #2563eb;
+        transition: 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .stat-card h6 {
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+
+    .stat-card h2 {
+        font-size: 30px;
+        font-weight: 700;
+        color: #172554;
+        margin: 0;
+    }
+
+    .stat-card .icon {
+        font-size: 25px;
+        margin-bottom: 12px;
+    }
+
+    .blue { border-color: #2563eb; }
+    .green { border-color: #16a34a; }
+    .red { border-color: #dc2626; }
+    .orange { border-color: #ea580c; }
+    .purple { border-color: #9333ea; }
+    .teal { border-color: #0d9488; }
+
+    .dashboard-section {
+        background: white;
+        padding: 22px;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-bottom: 25px;
+    }
+
+    .section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+        gap: 10px;
+    }
+
+    .section-heading h4 {
+        font-weight: 700;
+        color: #172554;
+        margin: 0;
+    }
+
+    .table-responsive {
+        border-radius: 10px;
+    }
+
+    .table {
+        vertical-align: middle;
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: #f1f5f9;
+        color: #334155;
+        font-size: 13px;
+        white-space: nowrap;
+        padding: 13px;
+    }
+
+    .table tbody td {
+        padding: 13px;
+        font-size: 14px;
+    }
+
+    .status-badge {
+        padding: 6px 11px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-admitted {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-discharged {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .status-other {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .progress {
+        height: 12px;
+        border-radius: 10px;
+        background: #e2e8f0;
+    }
+
+    .progress-bar {
+        border-radius: 10px;
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+    }
+
+    .action-card {
+        display: block;
+        padding: 20px;
+        border-radius: 12px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        text-decoration: none;
+        color: #172554;
+        transition: 0.2s;
+    }
+
+    .action-card:hover {
+        background: #eff6ff;
+        border-color: #2563eb;
+        transform: translateY(-3px);
+        color: #1d4ed8;
+    }
+
+    .action-card .action-icon {
+        font-size: 27px;
+        margin-bottom: 10px;
+    }
+
+    .action-card h6 {
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .action-card p {
+        color: #64748b;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .empty-message {
+        text-align: center;
+        color: #64748b;
+        padding: 30px;
+    }
+
+    @media(max-width: 600px) {
+        .dashboard-container {
+            padding: 10px 0;
+        }
+
+        .dashboard-section {
+            padding: 15px;
+        }
+
+        .dashboard-header h2 {
+            font-size: 23px;
+        }
+    }
+</style>
+
+{# Support both older and newer dashboard variable names #}
+
+{% set patient_count = total_patients|default(patients|default(0)) %}
+{% set bed_count = total_beds|default(total|default(0)) %}
+{% set occupied_count = occupied_beds|default(occupied|default(0)) %}
+{% set available_count = available_beds|default(available|default(0)) %}
+{% set ward_count = total_wards|default(wards|length if wards is defined and wards is iterable else 0) %}
+{% set waiting_total = waiting_count|default(waiting|default(0)) %}
+{% set admission_rows = recent_admissions|default(recent|default([])) %}
+
+{% set occupancy = (occupied_count * 100 / bed_count) if bed_count|int > 0 else 0 %}
+
+<div class="dashboard-container">
+
+    <!-- DASHBOARD HEADER -->
+
+    <div class="dashboard-header">
+
+        <div>
+            <h2>🏥 Admin Dashboard</h2>
+            <p>
+                Welcome, {{ session.get('name', 'Administrator') }}.
+                Here's your hospital overview.
+            </p>
+        </div>
+
+        <div>
+            <span class="badge bg-success p-2">
+                ● System Active
+            </span>
+        </div>
+
+    </div>
+
+
+    <!-- STATISTICS CARDS -->
+
+    <div class="stat-grid">
+
+        <div class="stat-card blue">
+            <div class="icon">👥</div>
+            <h6>Total Patients</h6>
+            <h2>{{ patient_count }}</h2>
+        </div>
+
+        <div class="stat-card purple">
+            <div class="icon">🛏️</div>
+            <h6>Total Beds</h6>
+            <h2>{{ bed_count }}</h2>
+        </div>
+
+        <div class="stat-card red">
+            <div class="icon">🔴</div>
+            <h6>Occupied Beds</h6>
+            <h2>{{ occupied_count }}</h2>
+        </div>
+
+        <div class="stat-card green">
+            <div class="icon">🟢</div>
+            <h6>Available Beds</h6>
+            <h2>{{ available_count }}</h2>
+        </div>
+
+        <div class="stat-card orange">
+            <div class="icon">🏢</div>
+            <h6>Total Wards</h6>
+            <h2>{{ ward_count }}</h2>
+        </div>
+
+        <div class="stat-card teal">
+            <div class="icon">⏳</div>
+            <h6>Waiting List</h6>
+            <h2>{{ waiting_total }}</h2>
+        </div>
+
+    </div>
+
+
+    <!-- BED OCCUPANCY -->
+
+    <div class="dashboard-section">
+
+        <div class="section-heading">
+            <h4>📊 Overall Bed Occupancy</h4>
+
+            <strong>
+                {{ "%.1f"|format(occupancy) }}%
+            </strong>
+        </div>
+
+        <div class="progress">
+            <div
+                class="progress-bar bg-primary"
+                role="progressbar"
+                style="width: {{ occupancy }}%;"
+                aria-valuenow="{{ occupancy }}"
+                aria-valuemin="0"
+                aria-valuemax="100">
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-2">
+            <small class="text-muted">
+                Occupied: {{ occupied_count }}
+            </small>
+
+            <small class="text-muted">
+                Available: {{ available_count }}
+            </small>
+        </div>
+
+    </div>
+
+
+    <!-- QUICK ACTIONS -->
+
+    <div class="dashboard-section">
+
+        <div class="section-heading">
+            <h4>⚡ Quick Actions</h4>
+        </div>
+
+        <div class="quick-actions">
+
+            <a href="{{ url_for('admit') }}" class="action-card">
+                <div class="action-icon">➕</div>
+                <h6>Admit Patient</h6>
+                <p>Register and allocate a bed to a patient.</p>
+            </a>
+
+            <a href="{{ url_for('patients') }}" class="action-card">
+                <div class="action-icon">👥</div>
+                <h6>Manage Patients</h6>
+                <p>View patient details and admission records.</p>
+            </a>
+
+            <a href="{{ url_for('beds') }}" class="action-card">
+                <div class="action-icon">🛏️</div>
+                <h6>Manage Beds</h6>
+                <p>View available and occupied beds.</p>
+            </a>
+
+            <a href="{{ url_for('waiting_list') }}" class="action-card">
+                <div class="action-icon">⏳</div>
+                <h6>Waiting List</h6>
+                <p>View patients waiting for bed allocation.</p>
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- RECENT ADMISSIONS -->
+
+    <div class="dashboard-section">
+
+        <div class="section-heading">
+
+            <h4>📋 Recent Admissions</h4>
+
+            <a href="{{ url_for('patients') }}"
+               class="btn btn-outline-primary btn-sm">
+                View All Patients
+            </a>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover">
+
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Patient ID</th>
+                        <th>Bed Number</th>
+                        <th>Admission Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% if admission_rows %}
+
+                        {% for row in admission_rows %}
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    {{ row.patient_name|default(row.name|default('N/A')) }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ row.login_id|default('N/A') }}
+                            </td>
+
+                            <td>
+                                {{ row.bed_number|default('N/A') }}
+                            </td>
+
+                            <td>
+                                {{ row.admission_date|default('N/A') }}
+                            </td>
+
+                            <td>
+
+                                {% set current_status = row.status|default('Unknown')|string|lower|trim %}
+
+                                {% if current_status == 'admitted' %}
+
+                                    <span class="status-badge status-admitted">
+                                        Admitted
+                                    </span>
+
+                                {% elif current_status == 'discharged' %}
+
+                                    <span class="status-badge status-discharged">
+                                        Discharged
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-other">
+                                        {{ row.status|default('Unknown') }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if current_status == 'admitted' and row.patient_id is defined %}
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for('discharge', patient_id=row.patient_id) }}"
+                                        onsubmit="return confirm('Are you sure you want to discharge this patient?');">
+
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm">
+                                            Discharge
+                                        </button>
+
+                                    </form>
+
+                                {% else %}
+
+                                    <span class="text-muted">—</span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+                            <td colspan="6" class="empty-message">
+                                No admission records available yet.
+                            </td>
+                        </tr>
+
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <div class="text-center text-muted mt-4 mb-3">
+        <small>
+            BedFlow | Hospital Bed Allocation and Patient Management System
+        </small>
+    </div>
+
+</div>
+
+{% endblock %}
